@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\ProductController;
 use App\Http\Controllers\Api\V1\ProfileController;
+use App\Http\Controllers\Api\V1\SectionController;
 use App\Http\Controllers\Api\V1\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -13,6 +14,8 @@ Route::prefix('auth')->group(function () {
 
     Route::middleware('auth:sanctum')->post('logout', [AuthController::class, 'logout']);
 });
+
+Route::middleware('auth:sanctum')->get('sections', [SectionController::class, 'index']);
 
 Route::middleware(['auth:sanctum', 'check.section:products'])->group(function () {
     Route::get('products/export/pdf', [ProductController::class, 'exportPdf']);

@@ -23,6 +23,9 @@ class AuthService
             ]);
         }
 
+        // Single active session per user: revoke previous tokens on each login.
+        $user->tokens()->delete();
+
         $token = $user->createToken('api-token')->plainTextToken;
 
         return [

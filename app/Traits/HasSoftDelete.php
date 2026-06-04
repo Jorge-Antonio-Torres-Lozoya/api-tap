@@ -2,7 +2,7 @@
 
 namespace App\Traits;
 
-use MongoDB\Laravel\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 trait HasSoftDelete
 {

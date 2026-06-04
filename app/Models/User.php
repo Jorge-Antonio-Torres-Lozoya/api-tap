@@ -5,19 +5,19 @@ namespace App\Models;
 use App\Observers\AuditObserver;
 use App\Traits\GeneratesCode;
 use App\Traits\HasAuditLog;
+use App\Traits\HasMongoApiTokens;
 use App\Traits\HasSoftDelete;
 use Illuminate\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Notifications\Notifiable;
-use Laravel\Sanctum\HasApiTokens;
 use MongoDB\Laravel\Eloquent\Model;
 
 #[ObservedBy([AuditObserver::class])]
 class User extends Model implements AuthenticatableContract
 {
-    use Authenticatable, HasApiTokens, HasSoftDelete, GeneratesCode, HasAuditLog, Notifiable;
+    use Authenticatable, HasMongoApiTokens, HasSoftDelete, GeneratesCode, HasAuditLog, Notifiable;
 
     protected $connection = 'mongodb';
     protected $collection = 'users';

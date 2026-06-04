@@ -50,9 +50,7 @@ return [
     |
     */
 
-    'expiration' => null,
-
-    'personal_access_model' => App\Models\PersonalAccessToken::class,
+    'expiration' => 480,
 
     /*
     |--------------------------------------------------------------------------
