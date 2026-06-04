@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\User\StoreUserRequest;
 use App\Http\Requests\User\UpdateUserRequest;
+use App\Http\Resources\UserListResource;
 use App\Http\Resources\UserResource;
 use App\Http\Traits\ApiResponse;
 use App\Models\User;
@@ -19,7 +20,7 @@ class UserController extends Controller
 
     public function index(): JsonResponse
     {
-        return $this->paginated($this->userService->paginate(), UserResource::class);
+        return $this->paginated($this->userService->paginate(), UserListResource::class);
     }
 
     public function store(StoreUserRequest $request): JsonResponse

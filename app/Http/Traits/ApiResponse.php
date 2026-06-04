@@ -8,7 +8,7 @@ use Illuminate\Pagination\LengthAwarePaginator;
 
 trait ApiResponse
 {
-    protected function success(mixed $data = null, string $message = '', int $status = 200): JsonResponse
+    protected function success(mixed $data = null, ?string $message = null, int $status = 200): JsonResponse
     {
         return response()->json([
             'success' => true,
@@ -23,7 +23,7 @@ trait ApiResponse
      *
      * @param  class-string<JsonResource>  $resource
      */
-    protected function paginated(LengthAwarePaginator $paginator, string $resource, string $message = ''): JsonResponse
+    protected function paginated(LengthAwarePaginator $paginator, string $resource, ?string $message = null): JsonResponse
     {
         return response()->json([
             'success' => true,

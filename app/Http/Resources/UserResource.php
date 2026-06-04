@@ -19,7 +19,7 @@ class UserResource extends JsonResource
             'profile_photo' => $this->profile_photo
                 ? Storage::url($this->profile_photo)
                 : null,
-            'profiles'      => $this->profiles()->map(fn ($p) => [
+            'profiles'      => $this->profiles()->map(fn($p) => [
                 'id'   => (string) $p->getKey(),
                 'code' => $p->code,
                 'name' => $p->name,
