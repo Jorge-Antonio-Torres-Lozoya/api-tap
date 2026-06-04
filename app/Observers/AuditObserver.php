@@ -12,8 +12,8 @@ class AuditObserver
 {
     public function created(Model $model): void
     {
-        AuditLog::create([
-            'collection'    => $model->getCollection(),
+        AuditLog::record([
+            'collection'    => $model->getTable(),
             'document_id'   => (string) $model->getKey(),
             'action'        => AuditActionEnum::CREATE,
             'previous_data' => null,
@@ -30,8 +30,8 @@ class AuditObserver
             return;
         }
 
-        AuditLog::create([
-            'collection'    => $model->getCollection(),
+        AuditLog::record([
+            'collection'    => $model->getTable(),
             'document_id'   => (string) $model->getKey(),
             'action'        => AuditActionEnum::UPDATE,
             'previous_data' => $this->extractFields($model, $model->getOriginal()),
@@ -42,8 +42,8 @@ class AuditObserver
 
     public function deleting(Model $model): void
     {
-        AuditLog::create([
-            'collection'    => $model->getCollection(),
+        AuditLog::record([
+            'collection'    => $model->getTable(),
             'document_id'   => (string) $model->getKey(),
             'action'        => AuditActionEnum::DELETE,
             'previous_data' => $this->extractFields($model, $model->getAttributes()),

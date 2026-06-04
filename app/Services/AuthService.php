@@ -2,7 +2,9 @@
 
 namespace App\Services;
 
+use App\Enums\AuditActionEnum;
 use App\Mail\ResetPasswordMail;
+use App\Models\AuditLog;
 use App\Models\PasswordReset;
 use App\Models\PersonalAccessToken;
 use App\Models\User;
@@ -18,6 +20,8 @@ class AuthService
         $user = User::where('username', $username)->first();
 
         if (!$user || !Hash::check($password, $user->password)) {
+            AuditLog::recordAuth(AuditActionEnum::LOGIN_FAILED, null, ['username' => $username]);
+
             throw ValidationException::withMessages([
                 'username' => ['Las credenciales proporcionadas son incorrectas.'],
             ]);
@@ -27,6 +31,8 @@ class AuthService
         $user->tokens()->delete();
 
         $token = $user->createToken('api-token')->plainTextToken;
+
+        AuditLog::recordAuth(AuditActionEnum::LOGIN, (string) $user->getKey());
 
         return [
             'token' => $token,
@@ -47,6 +53,8 @@ class AuthService
         if ($token instanceof PersonalAccessToken) {
             $token->delete();
         }
+
+        AuditLog::recordAuth(AuditActionEnum::LOGOUT, (string) $user->getKey());
     }
 
     public function forgotPassword(string $username): void
@@ -96,5 +104,7 @@ class AuthService
 
         // Revoke all tokens so the user must log in again with the new password
         $user->tokens()->delete();
+
+        AuditLog::recordAuth(AuditActionEnum::PASSWORD_RESET, (string) $user->getKey());
     }
 }
