@@ -19,9 +19,7 @@ class ProfileController extends Controller
 
     public function index(): JsonResponse
     {
-        $profiles = $this->profileService->paginate();
-
-        return $this->success(ProfileResource::collection($profiles)->response()->getData(true));
+        return $this->paginated($this->profileService->paginate(), ProfileResource::class);
     }
 
     public function store(StoreProfileRequest $request): JsonResponse

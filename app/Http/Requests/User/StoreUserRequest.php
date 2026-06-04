@@ -22,8 +22,8 @@ class StoreUserRequest extends FormRequest
             'phone'              => ['nullable', 'array'],
             'phone.country_code' => ['required_with:phone', 'string', 'regex:/^\+\d{1,4}$/'],
             'phone.number'       => ['required_with:phone', 'string', 'max:20'],
-            'profile_ids'        => ['nullable', 'array'],
-            'profile_ids.*'      => ['string'],
+            'profile_ids'        => ['required', 'array', 'min:1'],
+            'profile_ids.*'      => ['string', 'exists:mongodb.profiles,_id'],
         ];
     }
 }

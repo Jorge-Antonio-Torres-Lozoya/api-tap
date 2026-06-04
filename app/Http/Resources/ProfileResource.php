@@ -15,8 +15,8 @@ class ProfileResource extends JsonResource
             'code'       => $this->code,
             'name'       => $this->name,
             'sections'   => $this->resolvedSections(),
-            'created_at' => $this->created_at?->format('d/m/Y H:i'),
-            'updated_at' => $this->updated_at?->format('d/m/Y H:i'),
+            'created_at' => $this->created_at?->toIso8601String(),
+            'updated_at' => $this->updated_at?->toIso8601String(),
         ];
     }
 

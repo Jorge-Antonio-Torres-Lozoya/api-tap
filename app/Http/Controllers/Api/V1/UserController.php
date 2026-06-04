@@ -19,9 +19,7 @@ class UserController extends Controller
 
     public function index(): JsonResponse
     {
-        $users = $this->userService->paginate();
-
-        return $this->success(UserResource::collection($users)->response()->getData(true));
+        return $this->paginated($this->userService->paginate(), UserResource::class);
     }
 
     public function store(StoreUserRequest $request): JsonResponse

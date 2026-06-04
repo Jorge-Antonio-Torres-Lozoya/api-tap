@@ -24,8 +24,8 @@ class UserResource extends JsonResource
                 'code' => $p->code,
                 'name' => $p->name,
             ]),
-            'created_at'    => $this->created_at?->format('d/m/Y H:i'),
-            'updated_at'    => $this->updated_at?->format('d/m/Y H:i'),
+            'created_at'    => $this->created_at?->toIso8601String(),
+            'updated_at'    => $this->updated_at?->toIso8601String(),
         ];
     }
 }

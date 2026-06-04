@@ -19,9 +19,7 @@ class ProductController extends Controller
 
     public function index(): JsonResponse
     {
-        $products = $this->productService->paginate();
-
-        return $this->success(ProductResource::collection($products)->response()->getData(true));
+        return $this->paginated($this->productService->paginate(), ProductResource::class);
     }
 
     public function store(StoreProductRequest $request): JsonResponse
