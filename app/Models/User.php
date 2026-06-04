@@ -2,46 +2,70 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Foundation\Auth\User as Authenticatable;
+use App\Traits\GeneratesCode;
+use App\Traits\HasAuditLog;
+use App\Traits\HasSoftDelete;
+use Illuminate\Auth\Authenticatable;
+use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
+use MongoDB\Laravel\Eloquent\Model;
 
-class User extends Authenticatable
+class User extends Model implements AuthenticatableContract
 {
-    use HasFactory, Notifiable;
+    use Authenticatable, HasApiTokens, HasSoftDelete, GeneratesCode, HasAuditLog, Notifiable;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
+    protected $connection = 'mongodb';
+    protected $collection = 'users';
+
     protected $fillable = [
+        'code',
         'name',
-        'email',
+        'username',
         'password',
+        'phone',
+        'profile_photo',
+        'profile_ids',
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var array<int, string>
-     */
-    protected $hidden = [
-        'password',
-        'remember_token',
+    protected $hidden = ['password'];
+
+    protected $casts = [
+        'phone'       => 'array',
+        'profile_ids' => 'array',
+        'password'    => 'hashed',
     ];
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
+    protected array $auditableFields = ['name', 'username', 'phone', 'profile_photo', 'profile_ids'];
+
+    protected array $excludedAuditFields = ['password', 'remember_token'];
+
+    protected function getCodePrefix(): string
     {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
+        return 'USR';
+    }
+
+    // belongsToMany expects a pivot collection which doesn't exist in our MongoDB schema.
+    // profile_ids is an array of ObjectIds embedded in the user document itself.
+    public function profiles(): Collection
+    {
+        $ids = $this->profile_ids ?? [];
+
+        if (empty($ids)) {
+            return new Collection();
+        }
+
+        return Profile::whereIn('_id', $ids)->get();
+    }
+
+    public function getSectionSlugs(): array
+    {
+        return $this->profiles()
+            ->pluck('sections')
+            ->flatten()
+            ->unique()
+            ->values()
+            ->toArray();
     }
 }

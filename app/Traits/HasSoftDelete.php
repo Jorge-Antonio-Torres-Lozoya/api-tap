@@ -10,6 +10,6 @@ trait HasSoftDelete
 
     public function isDeleted(): bool
     {
-        return $this->deleted_at !== null;
+        return $this->trashed();
     }
 }
