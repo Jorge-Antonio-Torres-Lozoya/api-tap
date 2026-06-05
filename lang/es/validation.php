@@ -103,13 +103,13 @@ return [
     'uploaded'             => 'El campo :attribute no se pudo subir.',
     'url'                  => 'El campo :attribute debe ser una URL válida.',
 
-    'custom' => [
-        'password' => [
-            'min'    => 'La contraseña debe tener al menos :min caracteres.',
-            'mixed'  => 'La contraseña debe contener letras mayúsculas y minúsculas.',
-            'numbers' => 'La contraseña debe contener al menos un número.',
-            'letters' => 'La contraseña debe contener al menos una letra.',
-        ],
+    'password' => [
+        'min'           => 'La contraseña debe tener al menos :min caracteres.',
+        'mixed'         => 'La contraseña debe contener al menos una letra mayúscula y una minúscula.',
+        'letters'       => 'La contraseña debe contener al menos una letra.',
+        'numbers'       => 'La contraseña debe contener al menos un número.',
+        'symbols'       => 'La contraseña debe contener al menos un símbolo.',
+        'uncompromised' => 'La contraseña proporcionada apareció en una filtración de datos. Por favor, elige otra.',
     ],
 
     'attributes' => [

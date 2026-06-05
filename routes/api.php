@@ -8,9 +8,9 @@ use App\Http\Controllers\Api\V1\UserController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('auth')->group(function () {
-    Route::post('login', [AuthController::class, 'login']);
-    Route::post('forgot-password', [AuthController::class, 'forgotPassword']);
-    Route::post('reset-password', [AuthController::class, 'resetPassword']);
+    Route::post('login', [AuthController::class, 'login'])->middleware('throttle:login');
+    Route::post('forgot-password', [AuthController::class, 'forgotPassword'])->middleware('throttle:password');
+    Route::post('reset-password', [AuthController::class, 'resetPassword'])->middleware('throttle:password');
 
     Route::middleware('auth:sanctum')->post('logout', [AuthController::class, 'logout']);
 });

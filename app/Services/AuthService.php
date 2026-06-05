@@ -61,28 +61,30 @@ class AuthService
     {
         $user = User::where('username', $username)->first();
 
+        // Do not reveal whether the account exists: return silently so the
+        // controller always responds with the same generic success message.
         if (!$user) {
-            throw ValidationException::withMessages([
-                'username' => ['No existe una cuenta con ese correo electrónico.'],
-            ]);
+            return;
         }
 
         PasswordReset::where('username', $username)->delete();
 
-        $token = hash('sha256', Str::random(60));
+        // Email the plain token to the user but only persist its hash, so a
+        // database read cannot be used to hijack pending reset requests.
+        $plainToken = Str::random(64);
 
         PasswordReset::create([
             'username'   => $username,
-            'token'      => $token,
+            'token'      => hash('sha256', $plainToken),
             'expires_at' => now()->addMinutes(60),
         ]);
 
-        Mail::to($username)->send(new ResetPasswordMail($token));
+        Mail::to($username)->send(new ResetPasswordMail($plainToken));
     }
 
     public function resetPassword(string $token, string $password): void
     {
-        $reset = PasswordReset::where('token', $token)->first();
+        $reset = PasswordReset::where('token', hash('sha256', $token))->first();
 
         if (!$reset || $reset->isExpired()) {
             throw ValidationException::withMessages([
