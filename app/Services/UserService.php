@@ -13,6 +13,8 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class UserService
 {
+    public function __construct(private readonly AdministratorGuard $guard) {}
+
     public function paginate(int $perPage = 15): LengthAwarePaginator
     {
         return User::orderBy('created_at', 'desc')->paginate($perPage);
@@ -27,6 +29,10 @@ class UserService
 
     public function update(User $user, array $data, ?UploadedFile $photo): User
     {
+        if (array_key_exists('profile_ids', $data)) {
+            $this->guard->assertUserUpdatable($user, $data['profile_ids']);
+        }
+
         if ($photo) {
             $this->deletePhoto($user->profile_photo);
             $data['profile_photo'] = $photo->store('photos', 'public');
@@ -39,6 +45,8 @@ class UserService
 
     public function delete(User $user): void
     {
+        $this->guard->assertUserDeletable($user);
+
         $user->delete();
     }
 
@@ -52,7 +60,7 @@ class UserService
 
     public function exportExcel(): BinaryFileResponse
     {
-        return Excel::download(new UsersExport(), 'usuarios.xlsx');
+        return Excel::download(new UsersExport, 'usuarios.xlsx');
     }
 
     private function deletePhoto(?string $path): void

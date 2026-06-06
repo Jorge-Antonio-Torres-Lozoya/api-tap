@@ -11,6 +11,8 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class ProfileService
 {
+    public function __construct(private readonly AdministratorGuard $guard) {}
+
     public function paginate(int $perPage = 15): LengthAwarePaginator
     {
         return Profile::orderBy('created_at', 'desc')->paginate($perPage);
@@ -23,6 +25,10 @@ class ProfileService
 
     public function update(Profile $profile, array $data): Profile
     {
+        if (array_key_exists('sections', $data)) {
+            $this->guard->assertProfileUpdatable($profile, $data['sections']);
+        }
+
         $profile->update($data);
 
         return $profile->fresh();
@@ -30,6 +36,8 @@ class ProfileService
 
     public function delete(Profile $profile): void
     {
+        $this->guard->assertProfileDeletable($profile);
+
         $profile->delete();
     }
 
@@ -43,6 +51,6 @@ class ProfileService
 
     public function exportExcel(): BinaryFileResponse
     {
-        return Excel::download(new ProfilesExport(), 'perfiles.xlsx');
+        return Excel::download(new ProfilesExport, 'perfiles.xlsx');
     }
 }

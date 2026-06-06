@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\SectionSlugEnum;
 use App\Observers\AuditObserver;
 use App\Traits\GeneratesCode;
 use App\Traits\HasAuditLog;
@@ -17,9 +18,10 @@ use MongoDB\Laravel\Eloquent\Model;
 #[ObservedBy([AuditObserver::class])]
 class User extends Model implements AuthenticatableContract
 {
-    use Authenticatable, HasMongoApiTokens, HasSoftDelete, GeneratesCode, HasAuditLog, Notifiable;
+    use Authenticatable, GeneratesCode, HasAuditLog, HasMongoApiTokens, HasSoftDelete, Notifiable;
 
     protected $connection = 'mongodb';
+
     protected $collection = 'users';
 
     protected $fillable = [
@@ -35,9 +37,9 @@ class User extends Model implements AuthenticatableContract
     protected $hidden = ['password'];
 
     protected $casts = [
-        'phone'       => 'array',
+        'phone' => 'array',
         'profile_ids' => 'array',
-        'password'    => 'hashed',
+        'password' => 'hashed',
     ];
 
     protected array $auditableFields = ['name', 'username', 'phone', 'profile_photo', 'profile_ids'];
@@ -56,7 +58,7 @@ class User extends Model implements AuthenticatableContract
         $ids = $this->profile_ids ?? [];
 
         if (empty($ids)) {
-            return new Collection();
+            return new Collection;
         }
 
         return Profile::whereIn('_id', $ids)->get();
@@ -70,5 +72,11 @@ class User extends Model implements AuthenticatableContract
             ->unique()
             ->values()
             ->toArray();
+    }
+
+    // An administrator is any user whose profiles together grant every section.
+    public function isAdministrator(): bool
+    {
+        return empty(array_diff(SectionSlugEnum::values(), $this->getSectionSlugs()));
     }
 }
