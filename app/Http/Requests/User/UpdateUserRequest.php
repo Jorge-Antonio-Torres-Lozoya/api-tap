@@ -19,7 +19,7 @@ class UpdateUserRequest extends FormRequest
 
         return [
             'name'               => ['sometimes', 'required', 'string', 'max:255'],
-            'username'           => ['sometimes', 'required', 'email', Rule::unique('users', 'username')->ignore($userId, '_id')],
+            'username'           => ['sometimes', 'required', 'email', Rule::unique('users', 'username')->ignore($userId, '_id')->whereNull('deleted_at')],
             'password'           => ['sometimes', 'required', 'confirmed', Password::min(8)->letters()->numbers()],
             'profile_photo'      => ['sometimes', 'image', 'max:2048'],
             'phone'              => ['nullable', 'array'],

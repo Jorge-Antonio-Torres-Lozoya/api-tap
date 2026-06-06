@@ -18,7 +18,7 @@ class UpdateProfileRequest extends FormRequest
         $profileId = $this->route('profile')?->getKey();
 
         return [
-            'name'       => ['sometimes', 'required', 'string', 'max:255', Rule::unique('profiles', 'name')->ignore($profileId, '_id')],
+            'name'       => ['sometimes', 'required', 'string', 'max:255', Rule::unique('profiles', 'name')->ignore($profileId, '_id')->whereNull('deleted_at')],
             'sections'   => ['sometimes', 'required', 'array', 'min:1'],
             'sections.*' => ['string', Rule::in(SectionSlugEnum::values())],
         ];
