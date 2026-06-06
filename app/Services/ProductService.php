@@ -8,13 +8,19 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Maatwebsite\Excel\Facades\Excel;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
-use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ProductService
 {
-    public function paginate(int $perPage = 15): LengthAwarePaginator
+    public function paginate(?string $search = null, int $perPage = 15): LengthAwarePaginator
     {
-        return Product::orderBy('created_at', 'desc')->paginate($perPage);
+        return Product::query()
+            ->when($search, fn ($query, $term) => $query->where(function ($query) use ($term) {
+                $query->orWhere('code', 'like', "%{$term}%")
+                    ->orWhere('name', 'like', "%{$term}%")
+                    ->orWhere('brand', 'like', "%{$term}%");
+            }))
+            ->orderBy('created_at', 'desc')
+            ->paginate($perPage);
     }
 
     public function create(array $data): Product
@@ -44,6 +50,6 @@ class ProductService
 
     public function exportExcel(): BinaryFileResponse
     {
-        return Excel::download(new ProductsExport(), 'productos.xlsx');
+        return Excel::download(new ProductsExport, 'productos.xlsx');
     }
 }

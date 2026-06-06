@@ -10,6 +10,7 @@ use App\Http\Traits\ApiResponse;
 use App\Models\Profile;
 use App\Services\ProfileService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class ProfileController extends Controller
 {
@@ -17,9 +18,9 @@ class ProfileController extends Controller
 
     public function __construct(private readonly ProfileService $profileService) {}
 
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse
     {
-        return $this->paginated($this->profileService->paginate(), ProfileResource::class);
+        return $this->paginated($this->profileService->paginate($request->query('search')), ProfileResource::class);
     }
 
     public function store(StoreProfileRequest $request): JsonResponse

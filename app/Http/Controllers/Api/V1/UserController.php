@@ -11,6 +11,7 @@ use App\Http\Traits\ApiResponse;
 use App\Models\User;
 use App\Services\UserService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class UserController extends Controller
 {
@@ -18,9 +19,9 @@ class UserController extends Controller
 
     public function __construct(private readonly UserService $userService) {}
 
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse
     {
-        return $this->paginated($this->userService->paginate(), UserListResource::class);
+        return $this->paginated($this->userService->paginate($request->query('search')), UserListResource::class);
     }
 
     public function store(StoreUserRequest $request): JsonResponse

@@ -15,9 +15,16 @@ class UserService
 {
     public function __construct(private readonly AdministratorGuard $guard) {}
 
-    public function paginate(int $perPage = 15): LengthAwarePaginator
+    public function paginate(?string $search = null, int $perPage = 15): LengthAwarePaginator
     {
-        return User::orderBy('created_at', 'desc')->paginate($perPage);
+        return User::query()
+            ->when($search, fn ($query, $term) => $query->where(function ($query) use ($term) {
+                $query->orWhere('code', 'like', "%{$term}%")
+                    ->orWhere('name', 'like', "%{$term}%")
+                    ->orWhere('username', 'like', "%{$term}%");
+            }))
+            ->orderBy('created_at', 'desc')
+            ->paginate($perPage);
     }
 
     public function create(array $data, UploadedFile $photo): User
