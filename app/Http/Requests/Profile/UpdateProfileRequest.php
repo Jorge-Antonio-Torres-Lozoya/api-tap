@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Profile;
 
 use App\Enums\SectionSlugEnum;
+use App\Rules\CanOnlyAssignOwnedSections;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -18,8 +19,8 @@ class UpdateProfileRequest extends FormRequest
         $profileId = $this->route('profile')?->getKey();
 
         return [
-            'name'       => ['sometimes', 'required', 'string', 'max:255', Rule::unique('profiles', 'name')->ignore($profileId, '_id')->whereNull('deleted_at')],
-            'sections'   => ['sometimes', 'required', 'array', 'min:1'],
+            'name' => ['sometimes', 'required', 'string', 'max:255', Rule::unique('profiles', 'name')->ignore($profileId, '_id')->whereNull('deleted_at')],
+            'sections' => ['sometimes', 'required', 'array', 'min:1', new CanOnlyAssignOwnedSections($this->user()->getSectionSlugs())],
             'sections.*' => ['string', Rule::in(SectionSlugEnum::values())],
         ];
     }
